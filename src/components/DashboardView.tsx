@@ -126,7 +126,7 @@ export function DashboardView({
             </span>
           </div>
           <div className="mt-3 text-xs text-slate-500">
-            AI/GPU · Networks · IoT · Robotics
+            OS · DDCO · DBMS · OOPS · Python
           </div>
         </div>
 

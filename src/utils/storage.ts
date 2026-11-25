@@ -1,7 +1,7 @@
 import { INITIAL_CAMPUS_STATE } from '../data/sampleCampusData';
 import { CampusState } from '../types/campus';
 
-const STORAGE_KEY = 'omnisx_campus_digital_twin_v1';
+const STORAGE_KEY = 'omnisx_campus_digital_twin_v2';
 
 export function loadCampusState(): CampusState {
   try {

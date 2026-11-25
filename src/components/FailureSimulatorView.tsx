@@ -194,14 +194,14 @@ export function FailureSimulatorView({
               applyPreset(
                 'lab_unavailable',
                 'LAB-B1',
-                'Chiller leak & GPU rack thermal shutdown in AI Lab B1'
+                'Chiller leak & workstation shutdown in Python & OS Lab B1'
               )
             }
             className="text-left p-3.5 rounded-lg bg-sky-50/70 hover:bg-sky-100/80 border border-sky-200 transition-colors"
           >
-            <div className="text-xs font-semibold text-sky-900">AI Lab B1 Chiller Fault</div>
+            <div className="text-xs font-semibold text-sky-900">OS & Python Lab B1 Fault</div>
             <div className="text-[11px] text-slate-600 mt-1">
-              Tests GPU cluster relocation & timetable capacity checks
+              Tests workstation relocation & timetable capacity checks
             </div>
           </button>
 
@@ -211,12 +211,12 @@ export function FailureSimulatorView({
               applyPreset(
                 'lab_unavailable',
                 'LAB-B3',
-                'High-voltage bench trip in IoT & FPGA Lab B3'
+                'High-voltage bench trip in DDCO Hardware Lab B3'
               )
             }
             className="text-left p-3.5 rounded-lg bg-amber-50/70 hover:bg-amber-100/70 border border-amber-200 transition-colors"
           >
-            <div className="text-xs font-semibold text-amber-900">IoT Lab B3 Hardware Lockout</div>
+            <div className="text-xs font-semibold text-amber-900">DDCO Lab B3 Hardware Lockout</div>
             <div className="text-[11px] text-slate-600 mt-1">
               Demonstrates why same-slot lab swaps are Not Feasible
             </div>
