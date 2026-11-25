@@ -8,208 +8,143 @@ interface DependencyMappingViewProps {
   onSimulateResourceFailure: (category: ResourceCategory, resourceId: string) => void;
 }
 
-interface GraphNode {
-  id: string;
-  label: string;
-  sublabel: string;
-  column: 0 | 1 | 2 | 3 | 4;
-  kind: 'faculty' | 'course' | 'room' | 'batch' | 'bus';
-  status: 'Operational' | 'Maintenance' | 'Unavailable';
-  department?: string;
-}
-
-interface GraphEdge {
-  from: string;
-  to: string;
-}
+type FocusKind = 'room' | 'faculty' | 'course' | 'batch' | 'bus';
 
 export function DependencyMappingView({
   state,
   onSimulateResourceFailure,
 }: DependencyMappingViewProps) {
-  const [departmentFilter, setDepartmentFilter] = useState<string>('ALL');
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(
-    state.rooms.find((r) => r.id === 'LAB-B1')?.id ?? state.rooms[0]?.id ?? null
+  const [viewMode, setViewMode] = useState<'explorer' | 'matrix'>('explorer');
+  const [focusKind, setFocusKind] = useState<FocusKind>('room');
+  const [selectedId, setSelectedId] = useState<string>(
+    state.rooms.find((r) => r.id === 'LAB-B1')?.id ?? state.rooms[0]?.id ?? ''
   );
-  const [viewMode, setViewMode] = useState<'graph' | 'matrix'>('graph');
   const [matrixSearch, setMatrixSearch] = useState('');
 
-  const departments = useMemo(() => {
-    const depts = new Set(state.courses.map((c) => c.department));
-    return ['ALL', ...Array.from(depts)];
-  }, [state.courses]);
-
-  // Build filtered graph nodes & edges from live state
-  const { nodes, edges } = useMemo(() => {
-    const filteredSessions = state.timetable.filter((s) => {
-      if (departmentFilter === 'ALL') return true;
-      const course = state.courses.find((c) => c.id === s.courseId);
-      return course?.department === departmentFilter;
-    });
-
-    const usedFaculty = new Set(filteredSessions.map((s) => s.facultyId));
-    const usedCourses = new Set(filteredSessions.map((s) => s.courseId));
-    const usedRooms = new Set(filteredSessions.map((s) => s.roomId));
-    const usedBatches = new Set(filteredSessions.map((s) => s.batchId));
-    const usedBuses = new Set(
-      state.batches
-        .filter((b) => usedBatches.has(b.id) && b.primaryBusId)
-        .map((b) => b.primaryBusId!)
-    );
-
-    const gNodes: GraphNode[] = [
-      ...state.faculty
-        .filter((f) => departmentFilter === 'ALL' || usedFaculty.has(f.id))
-        .map((f) => ({
-          id: f.id,
-          label: f.name,
-          sublabel: f.department,
-          column: 0 as const,
-          kind: 'faculty' as const,
-          status: f.status,
-          department: f.department,
-        })),
-      ...state.courses
-        .filter((c) => departmentFilter === 'ALL' || usedCourses.has(c.id))
-        .map((c) => ({
-          id: c.id,
-          label: `${c.code}`,
-          sublabel: c.name,
-          column: 1 as const,
-          kind: 'course' as const,
-          status: 'Operational' as const,
-          department: c.department,
-        })),
-      ...state.rooms
-        .filter((r) => departmentFilter === 'ALL' || usedRooms.has(r.id))
-        .map((r) => ({
-          id: r.id,
-          label: r.code,
-          sublabel: `${r.name} · ${r.blockId}`,
-          column: 2 as const,
-          kind: 'room' as const,
-          status: r.status,
-        })),
-      ...state.batches
-        .filter((b) => departmentFilter === 'ALL' || usedBatches.has(b.id))
-        .map((b) => ({
-          id: b.id,
-          label: b.code,
-          sublabel: `${b.studentCount} students`,
-          column: 3 as const,
-          kind: 'batch' as const,
-          status: 'Operational' as const,
-        })),
-      ...state.buses
-        .filter((bus) => departmentFilter === 'ALL' || usedBuses.has(bus.id))
-        .map((bus) => ({
-          id: bus.id,
-          label: bus.code,
-          sublabel: bus.routeName,
-          column: 4 as const,
-          kind: 'bus' as const,
-          status: bus.status,
-        })),
-    ];
-
-    const edgeSet = new Set<string>();
-    const gEdges: GraphEdge[] = [];
-
-    const addEdge = (from: string, to: string) => {
-      const key = `${from}->${to}`;
-      if (!edgeSet.has(key)) {
-        edgeSet.add(key);
-        gEdges.push({ from, to });
-      }
-    };
-
-    for (const s of filteredSessions) {
-      addEdge(s.facultyId, s.courseId);
-      addEdge(s.courseId, s.roomId);
-      addEdge(s.roomId, s.batchId);
+  // Available items for the chosen category
+  const itemOptions = useMemo(() => {
+    if (focusKind === 'room') {
+      return state.rooms.map((r) => ({
+        id: r.id,
+        label: `${r.code} — ${r.name}`,
+        meta: `${r.blockId} · Cap ${r.capacity}`,
+        status: r.status,
+      }));
     }
-
-    for (const b of state.batches) {
-      if (b.primaryBusId && (departmentFilter === 'ALL' || usedBatches.has(b.id))) {
-        addEdge(b.id, b.primaryBusId);
-      }
+    if (focusKind === 'faculty') {
+      return state.faculty.map((f) => ({
+        id: f.id,
+        label: f.name,
+        meta: f.department,
+        status: f.status,
+      }));
     }
-
-    return { nodes: gNodes, edges: gEdges };
-  }, [state, departmentFilter]);
-
-  // Compute SVG coordinates for each column
-  const svgWidth = 1040;
-  const colX = [100, 310, 520, 730, 940];
-  const nodeW = 168;
-  const nodeH = 48;
-  const rowGap = 14;
-
-  const positionedNodes = useMemo(() => {
-    const columns: GraphNode[][] = [[], [], [], [], []];
-    for (const n of nodes) {
-      columns[n.column].push(n);
+    if (focusKind === 'course') {
+      return state.courses.map((c) => ({
+        id: c.id,
+        label: `${c.code} — ${c.name}`,
+        meta: c.department,
+        status: 'Operational' as const,
+      }));
     }
-    const maxRows = Math.max(1, ...columns.map((c) => c.length));
-    const totalHeight = Math.max(460, maxRows * (nodeH + rowGap) + 60);
+    if (focusKind === 'batch') {
+      return state.batches.map((b) => ({
+        id: b.id,
+        label: `${b.code} (${b.studentCount} students)`,
+        meta: b.department,
+        status: 'Operational' as const,
+      }));
+    }
+    return state.buses.map((bus) => ({
+      id: bus.id,
+      label: `${bus.code} — ${bus.routeName}`,
+      meta: `${bus.assignedStudentsCount} commuters`,
+      status: bus.status,
+    }));
+  }, [focusKind, state]);
 
-    const posMap = new Map<string, { x: number; y: number; node: GraphNode }>();
-    columns.forEach((colNodes, cIdx) => {
-      const colHeight = colNodes.length * nodeH + Math.max(0, colNodes.length - 1) * rowGap;
-      const startY = (totalHeight - colHeight) / 2 + 12;
-      colNodes.forEach((n, rIdx) => {
-        posMap.set(n.id, {
-          x: colX[cIdx] - nodeW / 2,
-          y: startY + rIdx * (nodeH + rowGap),
-          node: n,
-        });
+  // Ensure selectedId is valid whenever focusKind changes
+  const activeId = itemOptions.some((o) => o.id === selectedId)
+    ? selectedId
+    : itemOptions[0]?.id ?? '';
+
+  const activeItem = itemOptions.find((o) => o.id === activeId) ?? null;
+
+  // Resolve ONLY the timetable connections linked to activeId
+  const connectedRows = useMemo(() => {
+    if (!activeId) return [];
+
+    return state.timetable
+      .filter((s) => {
+        if (focusKind === 'room') return s.roomId === activeId;
+        if (focusKind === 'faculty') return s.facultyId === activeId;
+        if (focusKind === 'course') return s.courseId === activeId;
+        if (focusKind === 'batch') return s.batchId === activeId;
+        if (focusKind === 'bus') {
+          const bus = state.buses.find((b) => b.id === activeId);
+          return bus?.servedBatchIds.includes(s.batchId) ?? false;
+        }
+        return false;
+      })
+      .map((s) => {
+        const course = state.courses.find((c) => c.id === s.courseId)!;
+        const faculty = state.faculty.find((f) => f.id === s.facultyId)!;
+        const room = state.rooms.find((r) => r.id === s.roomId)!;
+        const batch = state.batches.find((b) => b.id === s.batchId)!;
+        const bus = state.buses.find((b) => b.id === batch.primaryBusId) ?? null;
+        return { session: s, course, faculty, room, batch, bus };
       });
-    });
+  }, [activeId, focusKind, state]);
 
-    return { posMap, totalHeight };
-  }, [nodes]);
+  // Plain-language blast summary for the currently selected item
+  const summaryStats = useMemo(() => {
+    const uniqueBatches = new Map<string, number>();
+    const uniqueFaculty = new Set<string>();
+    const uniqueOps = new Set<string>();
 
-  // Connected nodes BFS from selectedNodeId so selecting any node highlights the entire dependency chain
-  const connectedIds = useMemo(() => {
-    const set = new Set<string>();
-    if (!selectedNodeId) return set;
-    set.add(selectedNodeId);
-
-    // Traverse both upstream & downstream via edges
-    let changed = true;
-    while (changed) {
-      changed = false;
-      for (const e of edges) {
-        if (set.has(e.from) && !set.has(e.to)) {
-          set.add(e.to);
-          changed = true;
-        }
-        if (set.has(e.to) && !set.has(e.from)) {
-          set.add(e.from);
-          changed = true;
-        }
+    for (const row of connectedRows) {
+      uniqueBatches.set(row.batch.id, row.batch.studentCount);
+      uniqueFaculty.add(row.faculty.id);
+      for (const op of row.session.connectedOperations) {
+        uniqueOps.add(op);
       }
     }
-    return set;
-  }, [selectedNodeId, edges]);
 
-  const selectedNode = nodes.find((n) => n.id === selectedNodeId) ?? null;
+    const totalStudents = Array.from(uniqueBatches.values()).reduce((sum, n) => sum + n, 0);
 
-  // Sessions linked to selected node
-  const selectedSessions = useMemo(() => {
-    if (!selectedNode) return [];
-    return state.timetable.filter((s) => {
-      if (selectedNode.kind === 'faculty') return s.facultyId === selectedNode.id;
-      if (selectedNode.kind === 'course') return s.courseId === selectedNode.id;
-      if (selectedNode.kind === 'room') return s.roomId === selectedNode.id;
-      if (selectedNode.kind === 'batch') return s.batchId === selectedNode.id;
-      if (selectedNode.kind === 'bus') {
-        const bus = state.buses.find((b) => b.id === selectedNode.id);
-        return bus?.servedBatchIds.includes(s.batchId) ?? false;
-      }
-      return false;
-    });
-  }, [selectedNode, state]);
+    return {
+      sessionsCount: connectedRows.length,
+      totalStudents,
+      facultyCount: uniqueFaculty.size,
+      opsCount: uniqueOps.size,
+    };
+  }, [connectedRows]);
+
+  const handleCategorySwitch = (kind: FocusKind) => {
+    setFocusKind(kind);
+    if (kind === 'room') setSelectedId(state.rooms[0]?.id ?? '');
+    if (kind === 'faculty') setSelectedId(state.faculty[0]?.id ?? '');
+    if (kind === 'course') setSelectedId(state.courses[0]?.id ?? '');
+    if (kind === 'batch') setSelectedId(state.batches[0]?.id ?? '');
+    if (kind === 'bus') setSelectedId(state.buses[0]?.id ?? '');
+  };
+
+  const jumpToNode = (kind: FocusKind, id: string) => {
+    setFocusKind(kind);
+    setSelectedId(id);
+  };
+
+  const triggerFailure = () => {
+    if (!activeId) return;
+    if (focusKind === 'room') {
+      const room = state.rooms.find((r) => r.id === activeId);
+      onSimulateResourceFailure(room?.category ?? 'classroom', activeId);
+    } else if (focusKind === 'faculty') {
+      onSimulateResourceFailure('faculty', activeId);
+    } else if (focusKind === 'bus') {
+      onSimulateResourceFailure('bus', activeId);
+    }
+  };
 
   const matrixSessions = useMemo(() => {
     return state.timetable.filter((s) => {
@@ -218,278 +153,306 @@ export function DependencyMappingView({
       const room = state.rooms.find((r) => r.id === s.roomId);
       const batch = state.batches.find((b) => b.id === s.batchId);
 
-      if (departmentFilter !== 'ALL' && course?.department !== departmentFilter) return false;
-      if (matrixSearch.trim()) {
-        const q = matrixSearch.toLowerCase();
-        return (
-          course?.code.toLowerCase().includes(q) ||
-          course?.name.toLowerCase().includes(q) ||
-          fac?.name.toLowerCase().includes(q) ||
-          room?.code.toLowerCase().includes(q) ||
-          batch?.code.toLowerCase().includes(q) ||
-          s.day.toLowerCase().includes(q)
-        );
-      }
-      return true;
+      if (!matrixSearch.trim()) return true;
+      const q = matrixSearch.toLowerCase();
+      return (
+        course?.code.toLowerCase().includes(q) ||
+        course?.name.toLowerCase().includes(q) ||
+        fac?.name.toLowerCase().includes(q) ||
+        room?.code.toLowerCase().includes(q) ||
+        batch?.code.toLowerCase().includes(q) ||
+        s.day.toLowerCase().includes(q)
+      );
     });
-  }, [state, departmentFilter, matrixSearch]);
+  }, [state, matrixSearch]);
 
-  const triggerFailureFromNode = () => {
-    if (!selectedNode) return;
-    if (selectedNode.kind === 'room') {
-      const room = state.rooms.find((r) => r.id === selectedNode.id);
-      onSimulateResourceFailure(room?.category ?? 'classroom', selectedNode.id);
-    } else if (selectedNode.kind === 'faculty') {
-      onSimulateResourceFailure('faculty', selectedNode.id);
-    } else if (selectedNode.kind === 'bus') {
-      onSimulateResourceFailure('bus', selectedNode.id);
-    }
-  };
+  const kindTabs: { id: FocusKind; label: string }[] = [
+    { id: 'room', label: 'Classrooms & Labs' },
+    { id: 'faculty', label: 'Faculty' },
+    { id: 'course', label: 'Courses' },
+    { id: 'batch', label: 'Student Cohorts' },
+    { id: 'bus', label: 'Transit Buses' },
+  ];
 
   return (
     <div className="space-y-5">
-      {/* Toolbar */}
-      <div className="bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-1 p-1 bg-[#071020] rounded-lg border border-[#162745]">
-            <button
-              type="button"
-              onClick={() => setViewMode('graph')}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
-                viewMode === 'graph' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Interactive Dependency Graph
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('matrix')}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
-                viewMode === 'matrix' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Timetable Cross-Matrix
-            </button>
-          </div>
-
-          <select
-            value={departmentFilter}
-            onChange={(e) => setDepartmentFilter(e.target.value)}
-            aria-label="Filter by department"
-            className="px-3 py-2 text-xs bg-[#071020] border border-[#1A2D4F] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+      {/* Top Bar: View Toggle + Plain Instructions */}
+      <div className="bg-white border border-sky-200/80 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xs">
+        <div className="flex items-center gap-1 p-1 bg-sky-50 rounded-lg border border-sky-200/80">
+          <button
+            type="button"
+            onClick={() => setViewMode('explorer')}
+            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
+              viewMode === 'explorer'
+                ? 'bg-sky-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
           >
-            {departments.map((d) => (
-              <option key={d} value={d}>
-                {d === 'ALL' ? 'All Campus Departments' : d}
-              </option>
-            ))}
-          </select>
+            Simple Dependency Explorer
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('matrix')}
+            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
+              viewMode === 'matrix'
+                ? 'bg-sky-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Full Timetable Matrix
+          </button>
         </div>
 
-        <div className="text-xs text-slate-400">
-          Click any node to trace upstream & downstream operational links
+        <div className="text-xs text-slate-500">
+          Pick any campus resource below to see only its direct connections without visual clutter
         </div>
       </div>
 
-      {viewMode === 'graph' ? (
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
-          {/* Interactive SVG Graph Canvas */}
-          <div className="xl:col-span-8 bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-4 overflow-x-auto">
-            <div className="min-w-[820px]">
-              {/* Column Headers */}
-              <div className="grid grid-cols-5 text-center text-xs font-medium text-slate-400 pb-2 border-b border-[#152542]">
-                <span>Faculty</span>
-                <span>Courses</span>
-                <span>Classrooms & Labs</span>
-                <span>Student Cohorts</span>
-                <span>Transit Buses</span>
+      {viewMode === 'explorer' ? (
+        <div className="space-y-5">
+          {/* Step 1: Category & Resource Picker */}
+          <div className="bg-white border border-sky-200/80 rounded-xl p-5 space-y-4 shadow-xs">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-1.5">
+                {kindTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => handleCategorySwitch(tab.id)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap ${
+                      focusKind === tab.id
+                        ? 'bg-sky-600 text-white border-sky-600'
+                        : 'bg-sky-50/60 text-slate-700 border-sky-200 hover:bg-sky-100/70'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
 
-              <svg
-                viewBox={`0 0 ${svgWidth} ${positionedNodes.totalHeight}`}
-                className="w-full h-auto block"
-              >
-                {/* Edges */}
-                {edges.map((edge) => {
-                  const fromPos = positionedNodes.posMap.get(edge.from);
-                  const toPos = positionedNodes.posMap.get(edge.to);
-                  if (!fromPos || !toPos) return null;
+              {(focusKind === 'room' || focusKind === 'faculty' || focusKind === 'bus') && activeItem && (
+                <button
+                  type="button"
+                  onClick={triggerFailure}
+                  className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors whitespace-nowrap"
+                >
+                  <AlertTriangle className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Simulate Failure on Selected</span>
+                </button>
+              )}
+            </div>
 
-                  const x1 = fromPos.x + nodeW;
-                  const y1 = fromPos.y + nodeH / 2;
-                  const x2 = toPos.x;
-                  const y2 = toPos.y + nodeH / 2;
-                  const cx1 = x1 + (x2 - x1) * 0.45;
-                  const cx2 = x2 - (x2 - x1) * 0.45;
-
-                  const isHighlighted =
-                    !selectedNodeId ||
-                    (connectedIds.has(edge.from) && connectedIds.has(edge.to));
-
-                  return (
-                    <path
-                      key={`${edge.from}-${edge.to}`}
-                      d={`M ${x1} ${y1} C ${cx1} ${y1}, ${cx2} ${y2}, ${x2} ${y2}`}
-                      fill="none"
-                      stroke={isHighlighted && selectedNodeId ? '#3B82F6' : '#263F6B'}
-                      strokeWidth={isHighlighted && selectedNodeId ? 2.2 : 1.2}
-                      strokeOpacity={isHighlighted ? 0.9 : 0.16}
-                    />
-                  );
-                })}
-
-                {/* Nodes */}
-                {Array.from(positionedNodes.posMap.values()).map(({ x, y, node }) => {
-                  const isSelected = selectedNodeId === node.id;
-                  const isConnected = !selectedNodeId || connectedIds.has(node.id);
-                  const isDown = node.status === 'Unavailable';
-                  const isMaint = node.status === 'Maintenance';
-
-                  const strokeColor = isSelected
-                    ? '#60A5FA'
-                    : isDown
-                    ? '#EF4444'
-                    : isMaint
-                    ? '#F59E0B'
-                    : isConnected && selectedNodeId
-                    ? '#3B82F6'
-                    : '#1E3358';
-
-                  const fillColor = isSelected
-                    ? '#132B54'
-                    : isDown
-                    ? '#23101B'
-                    : '#091529';
-
-                  return (
-                    <g
-                      key={node.id}
-                      transform={`translate(${x}, ${y})`}
-                      onClick={() => setSelectedNodeId(node.id)}
-                      className="cursor-pointer"
-                      style={{ opacity: isConnected ? 1 : 0.25 }}
-                    >
-                      <rect
-                        width={nodeW}
-                        height={nodeH}
-                        rx={8}
-                        fill={fillColor}
-                        stroke={strokeColor}
-                        strokeWidth={isSelected ? 2 : 1.2}
-                      />
-                      <text
-                        x={12}
-                        y={20}
-                        fill={isDown ? '#FCA5A5' : '#F8FAFC'}
-                        fontSize="12"
-                        fontWeight="600"
-                        fontFamily="Plus Jakarta Sans, sans-serif"
-                      >
-                        {node.label.length > 21 ? `${node.label.slice(0, 20)}…` : node.label}
-                      </text>
-                      <text
-                        x={12}
-                        y={36}
-                        fill="#94A3B8"
-                        fontSize="10"
-                        fontFamily="Plus Jakarta Sans, sans-serif"
-                      >
-                        {node.sublabel.length > 26
-                          ? `${node.sublabel.slice(0, 25)}…`
-                          : node.sublabel}
-                      </text>
-                    </g>
-                  );
-                })}
-              </svg>
+            {/* Selectable Item Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
+              {itemOptions.map((item) => {
+                const isSelected = item.id === activeId;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setSelectedId(item.id)}
+                    className={`text-left p-3 rounded-lg border transition-colors ${
+                      isSelected
+                        ? 'bg-sky-50 border-sky-500 ring-1 ring-sky-500/30'
+                        : 'bg-white border-sky-200/70 hover:bg-sky-50/40 hover:border-sky-300'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-xs font-semibold text-slate-900 leading-snug">
+                        {item.label}
+                      </span>
+                    </div>
+                    <div className="mt-1.5 flex items-center justify-between gap-2 text-[11px] text-slate-500">
+                      <span className="truncate">{item.meta}</span>
+                      <StatusLabel status={item.status} />
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Right Dependency Inspector Panel */}
-          <div className="xl:col-span-4 bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-5 flex flex-col justify-between">
-            {selectedNode ? (
-              <div className="space-y-5">
-                <div className="border-b border-[#1A2D4F] pb-4">
-                  <div className="text-xs text-slate-400 capitalize">
-                    {selectedNode.kind} Node · <span className="font-mono">{selectedNode.id}</span>
-                  </div>
-                  <h3 className="text-base font-semibold text-white mt-1">
-                    {selectedNode.label}
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">{selectedNode.sublabel}</p>
-                  <div className="mt-2.5">
-                    <StatusLabel status={selectedNode.status} />
-                  </div>
+          {/* Step 2: Plain-Language Impact Summary */}
+          {activeItem && (
+            <div className="bg-sky-50/70 border border-sky-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
+              <div className="space-y-0.5">
+                <div className="text-xs font-semibold text-sky-950">
+                  Direct Connections for {activeItem.label}
                 </div>
+                <p className="text-xs text-slate-600">
+                  {summaryStats.sessionsCount === 0
+                    ? 'No scheduled timetable classes currently depend on this item.'
+                    : `Connected to ${summaryStats.sessionsCount} weekly class${
+                        summaryStats.sessionsCount === 1 ? '' : 'es'
+                      }, ${summaryStats.facultyCount} faculty member${
+                        summaryStats.facultyCount === 1 ? '' : 's'
+                      }, ${summaryStats.totalStudents} students, and ${summaryStats.opsCount} downstream campus operations.`}
+                </p>
+              </div>
+              <div className="flex items-center gap-4 text-xs font-mono tabular-nums text-sky-900 font-semibold">
+                <span>{summaryStats.sessionsCount} classes</span>
+                <span aria-hidden="true" className="text-sky-300">·</span>
+                <span>{summaryStats.totalStudents} students</span>
+              </div>
+            </div>
+          )}
 
-                <div>
-                  <div className="text-xs font-semibold text-slate-300 mb-2.5">
-                    Linked Timetable Operations ({selectedSessions.length})
-                  </div>
-                  {selectedSessions.length === 0 ? (
-                    <p className="text-xs text-slate-400">
-                      No active timetable sessions currently bound to this node.
-                    </p>
-                  ) : (
-                    <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-                      {selectedSessions.map((s) => {
-                        const course = state.courses.find((c) => c.id === s.courseId);
-                        const room = state.rooms.find((r) => r.id === s.roomId);
-                        const fac = state.faculty.find((f) => f.id === s.facultyId);
-                        const batch = state.batches.find((b) => b.id === s.batchId);
+          {/* Step 3: Clean Row-by-Row Connected Chains (Zero Crossing Lines) */}
+          <div className="bg-white border border-sky-200/80 rounded-xl p-5 space-y-4 shadow-xs">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-sm font-semibold text-slate-900">
+                  Connected Dependency Chains
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Each row shows one complete operational chain. Click any card to inspect that item.
+                </p>
+              </div>
+            </div>
 
-                        return (
-                          <div
-                            key={s.id}
-                            className="p-3 rounded-lg bg-[#081224] border border-[#182B4B] space-y-1 text-xs"
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="font-mono text-blue-300 font-medium">
-                                {course?.code} · {s.day} {s.timeSlot}
-                              </span>
-                              <span className="text-slate-400">{batch?.code}</span>
-                            </div>
-                            <div className="text-slate-200 font-medium">{course?.name}</div>
-                            <div className="text-slate-400">
-                              {room?.code} · {fac?.name}
-                            </div>
-                            {s.connectedOperations.length > 0 && (
-                              <div className="pt-1 text-[11px] text-slate-400">
-                                Connected: {s.connectedOperations.join(' · ')}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                {(selectedNode.kind === 'room' ||
-                  selectedNode.kind === 'faculty' ||
-                  selectedNode.kind === 'bus') && (
-                  <button
-                    type="button"
-                    onClick={triggerFailureFromNode}
-                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-medium text-white bg-rose-600 hover:bg-rose-500 rounded-lg transition-colors"
-                  >
-                    <AlertTriangle className="w-3.5 h-3.5" aria-hidden="true" />
-                    <span>Simulate Failure on This Resource</span>
-                    <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                  </button>
-                )}
+            {connectedRows.length === 0 ? (
+              <div className="py-8 text-center text-xs text-slate-500 bg-sky-50/40 rounded-lg border border-sky-100">
+                No timetable dependencies found for this selection.
               </div>
             ) : (
-              <div className="text-xs text-slate-400 py-8 text-center">
-                Select any node in the campus dependency graph to inspect linked courses, cohorts, equipment, and timetable operations.
+              <div className="space-y-3">
+                {/* Column Guide */}
+                <div className="hidden lg:grid lg:grid-cols-11 gap-2 px-2 text-[11px] font-semibold text-slate-500">
+                  <div className="col-span-2">1. Faculty</div>
+                  <div className="col-span-1" />
+                  <div className="col-span-2">2. Course & Slot</div>
+                  <div className="col-span-1" />
+                  <div className="col-span-2">3. Room & Equipment</div>
+                  <div className="col-span-1" />
+                  <div className="col-span-2">4. Students & Bus</div>
+                </div>
+
+                {connectedRows.map(({ session, course, faculty, room, batch, bus }) => (
+                  <div
+                    key={session.id}
+                    className="p-3.5 rounded-xl bg-sky-50/40 border border-sky-200/80 space-y-3"
+                  >
+                    <div className="grid grid-cols-1 lg:grid-cols-11 gap-2 items-center">
+                      {/* 1. Faculty */}
+                      <button
+                        type="button"
+                        onClick={() => jumpToNode('faculty', faculty.id)}
+                        className={`lg:col-span-2 text-left p-2.5 rounded-lg border transition-colors ${
+                          focusKind === 'faculty' && activeId === faculty.id
+                            ? 'bg-sky-100 border-sky-500'
+                            : 'bg-white border-sky-200 hover:border-sky-400'
+                        }`}
+                      >
+                        <div className="text-[10px] font-medium text-slate-400 lg:hidden">Faculty</div>
+                        <div className="text-xs font-semibold text-slate-900 truncate">
+                          {faculty.name}
+                        </div>
+                        <div className="text-[11px] text-slate-500 truncate mt-0.5">
+                          {faculty.department}
+                        </div>
+                        <div className="mt-1">
+                          <StatusLabel status={faculty.status} />
+                        </div>
+                      </button>
+
+                      <div className="hidden lg:flex justify-center text-sky-500">
+                        <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                      </div>
+
+                      {/* 2. Course & Timetable Slot */}
+                      <button
+                        type="button"
+                        onClick={() => jumpToNode('course', course.id)}
+                        className={`lg:col-span-2 text-left p-2.5 rounded-lg border transition-colors ${
+                          focusKind === 'course' && activeId === course.id
+                            ? 'bg-sky-100 border-sky-500'
+                            : 'bg-white border-sky-200 hover:border-sky-400'
+                        }`}
+                      >
+                        <div className="text-[10px] font-medium text-slate-400 lg:hidden">Course</div>
+                        <div className="font-mono text-xs font-semibold text-sky-700">
+                          {course.code} · {session.day} {session.timeSlot}
+                        </div>
+                        <div className="text-xs font-medium text-slate-900 truncate mt-0.5">
+                          {course.name}
+                        </div>
+                        <div className="text-[11px] text-slate-500 mt-0.5">
+                          {session.sessionType}
+                        </div>
+                      </button>
+
+                      <div className="hidden lg:flex justify-center text-sky-500">
+                        <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                      </div>
+
+                      {/* 3. Room / Lab & Required Equipment */}
+                      <button
+                        type="button"
+                        onClick={() => jumpToNode('room', room.id)}
+                        className={`lg:col-span-2 text-left p-2.5 rounded-lg border transition-colors ${
+                          focusKind === 'room' && activeId === room.id
+                            ? 'bg-sky-100 border-sky-500'
+                            : 'bg-white border-sky-200 hover:border-sky-400'
+                        }`}
+                      >
+                        <div className="text-[10px] font-medium text-slate-400 lg:hidden">Room / Lab</div>
+                        <div className="font-mono text-xs font-semibold text-slate-900">
+                          {room.code} ({room.blockId})
+                        </div>
+                        <div className="text-[11px] text-slate-600 truncate mt-0.5">
+                          {course.requiredEquipmentTypes.join(', ') || 'Standard Projector'}
+                        </div>
+                        <div className="mt-1">
+                          <StatusLabel status={room.status} />
+                        </div>
+                      </button>
+
+                      <div className="hidden lg:flex justify-center text-sky-500">
+                        <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                      </div>
+
+                      {/* 4. Student Cohort & Transit Bus */}
+                      <div className="lg:col-span-2 space-y-1.5">
+                        <button
+                          type="button"
+                          onClick={() => jumpToNode('batch', batch.id)}
+                          className={`w-full text-left p-2.5 rounded-lg border transition-colors ${
+                            focusKind === 'batch' && activeId === batch.id
+                              ? 'bg-sky-100 border-sky-500'
+                              : 'bg-white border-sky-200 hover:border-sky-400'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between text-xs font-semibold text-slate-900">
+                            <span>{batch.code}</span>
+                            <span className="font-mono text-sky-700 tabular-nums">
+                              {batch.studentCount} students
+                            </span>
+                          </div>
+                          {bus && (
+                            <div className="text-[11px] text-slate-500 mt-0.5 truncate">
+                              Bus {bus.code} · {batch.commuterCount} commuters
+                            </div>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {session.connectedOperations.length > 0 && (
+                      <div className="pt-2 border-t border-sky-200/60 flex flex-wrap items-center gap-2 text-[11px] text-slate-600">
+                        <span className="font-semibold text-sky-900">Connected Operations:</span>
+                        <span>{session.connectedOperations.join(' · ')}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
           </div>
         </div>
       ) : (
-        /* Timetable Cross-Matrix View */
-        <div className="bg-[#0B172D] border border-[#1A2D4F] rounded-xl overflow-hidden">
-          <div className="p-4 border-b border-[#1A2D4F] flex items-center justify-between gap-4">
+        /* Full Timetable Cross-Matrix View */
+        <div className="bg-white border border-sky-200/80 rounded-xl overflow-hidden shadow-xs">
+          <div className="p-4 border-b border-sky-100 bg-sky-50/40 flex items-center justify-between gap-4">
             <div className="relative flex-1 max-w-md">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
               <input
@@ -497,10 +460,10 @@ export function DependencyMappingView({
                 value={matrixSearch}
                 onChange={(e) => setMatrixSearch(e.target.value)}
                 placeholder="Search timetable by course, room, faculty, day, or cohort..."
-                className="w-full pl-9 pr-3 py-2 text-xs bg-[#071020] border border-[#1A2D4F] rounded-lg text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-blue-500"
+                className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-sky-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-sky-500"
               />
             </div>
-            <div className="text-xs text-slate-400 font-mono tabular-nums">
+            <div className="text-xs text-slate-500 font-mono tabular-nums">
               {matrixSessions.length} scheduled sessions
             </div>
           </div>
@@ -508,7 +471,7 @@ export function DependencyMappingView({
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-[#1A2D4F] bg-[#081224] text-xs font-medium text-slate-400">
+                <tr className="border-b border-sky-200/80 bg-sky-50/70 text-xs font-medium text-slate-600">
                   <th className="py-3 px-4 whitespace-nowrap">Slot</th>
                   <th className="py-3 px-4 whitespace-nowrap">Course</th>
                   <th className="py-3 px-4 whitespace-nowrap">Faculty</th>
@@ -518,7 +481,7 @@ export function DependencyMappingView({
                   <th className="py-3 px-4 whitespace-nowrap">Connected Operations</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#152542] text-xs">
+              <tbody className="divide-y divide-sky-100 text-xs">
                 {matrixSessions.map((s) => {
                   const course = state.courses.find((c) => c.id === s.courseId)!;
                   const fac = state.faculty.find((f) => f.id === s.facultyId)!;
@@ -527,38 +490,38 @@ export function DependencyMappingView({
                   const bus = state.buses.find((b) => b.id === batch.primaryBusId);
 
                   return (
-                    <tr key={s.id} className="hover:bg-[#0E1D38] transition-colors">
-                      <td className="py-3 px-4 font-mono tabular-nums text-blue-300 whitespace-nowrap">
+                    <tr key={s.id} className="hover:bg-sky-50/60 transition-colors">
+                      <td className="py-3 px-4 font-mono tabular-nums text-sky-700 font-semibold whitespace-nowrap">
                         {s.day} {s.timeSlot}
                       </td>
                       <td className="py-3 px-4">
-                        <div className="font-medium text-white">
+                        <div className="font-medium text-slate-900">
                           {course.code} — {course.name}
                         </div>
-                        <div className="text-slate-400">{s.sessionType}</div>
+                        <div className="text-slate-500">{s.sessionType}</div>
                       </td>
-                      <td className="py-3 px-4 whitespace-nowrap text-slate-200">
+                      <td className="py-3 px-4 whitespace-nowrap text-slate-800">
                         <div>{fac.name}</div>
                         <StatusLabel status={fac.status} />
                       </td>
                       <td className="py-3 px-4 whitespace-nowrap">
-                        <div className="font-mono text-slate-200">
+                        <div className="font-mono text-slate-800">
                           {room.code} ({room.blockId})
                         </div>
                         <StatusLabel status={room.status} />
                       </td>
-                      <td className="py-3 px-4 text-slate-400 max-w-xs">
+                      <td className="py-3 px-4 text-slate-600 max-w-xs">
                         {course.requiredEquipmentTypes.join(', ') || 'Standard Classroom'}
                       </td>
-                      <td className="py-3 px-4 whitespace-nowrap text-slate-300 tabular-nums">
+                      <td className="py-3 px-4 whitespace-nowrap text-slate-700 tabular-nums">
                         <div>
                           {batch.code} ({batch.studentCount} students)
                         </div>
-                        <div className="text-slate-400">
+                        <div className="text-slate-500">
                           {bus ? `${bus.code} (${batch.commuterCount} commuters)` : 'Campus Hostel'}
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-slate-400 max-w-xs">
+                      <td className="py-3 px-4 text-slate-500 max-w-xs">
                         {s.connectedOperations.join(' · ')}
                       </td>
                     </tr>

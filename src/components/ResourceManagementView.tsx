@@ -223,7 +223,9 @@ export function ResourceManagementView({
 
     onUpdateState((prev) => {
       if (formCategory === 'classroom' || formCategory === 'lab') {
-        const roomId = editingItem ? editingItem.id : `${formCategory === 'lab' ? 'LAB' : 'CR'}-${Date.now().toString().slice(-4)}`;
+        const roomId = editingItem
+          ? editingItem.id
+          : `${formCategory === 'lab' ? 'LAB' : 'CR'}-${Date.now().toString().slice(-4)}`;
         const roomObj: RoomResource = {
           id: roomId,
           code: formCode.trim() || roomId,
@@ -371,9 +373,9 @@ export function ResourceManagementView({
   return (
     <div className="space-y-5">
       {/* Filter & Action Toolbar */}
-      <div className="bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-4 space-y-4">
+      <div className="bg-white border border-sky-200/80 rounded-xl p-4 space-y-4 shadow-xs">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-1 p-1 bg-[#071020] rounded-lg border border-[#162745]">
+          <div className="flex flex-wrap items-center gap-1 p-1 bg-sky-50 rounded-lg border border-sky-200/80">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -381,11 +383,11 @@ export function ResourceManagementView({
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
                   activeTab === tab.id
-                    ? 'bg-blue-600 text-white'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                {tab.label} <span className="font-mono tabular-nums opacity-75 ml-1">{tab.count}</span>
+                {tab.label} <span className="font-mono tabular-nums opacity-80 ml-1">{tab.count}</span>
               </button>
             ))}
           </div>
@@ -393,7 +395,7 @@ export function ResourceManagementView({
           <button
             type="button"
             onClick={openAddModal}
-            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-sky-600 hover:bg-sky-700 rounded-lg transition-colors whitespace-nowrap shrink-0"
           >
             <Plus className="w-4 h-4" aria-hidden="true" />
             <span>Add Resource</span>
@@ -408,19 +410,19 @@ export function ResourceManagementView({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by code, name, block, or equipment..."
-              className="w-full pl-9 pr-3 py-2 text-xs bg-[#071020] border border-[#1A2D4F] rounded-lg text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full pl-9 pr-3 py-2 text-xs bg-sky-50/50 border border-sky-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <label htmlFor="status-filter" className="text-xs text-slate-400 whitespace-nowrap">
+            <label htmlFor="status-filter" className="text-xs text-slate-600 whitespace-nowrap">
               Status:
             </label>
             <select
               id="status-filter"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as 'ALL' | ResourceStatus)}
-              className="px-3 py-2 text-xs bg-[#071020] border border-[#1A2D4F] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+              className="px-3 py-2 text-xs bg-sky-50/50 border border-sky-200 rounded-lg text-slate-800 focus:outline-none focus:border-sky-500"
             >
               <option value="ALL">All Statuses</option>
               <option value="Operational">Operational</option>
@@ -432,11 +434,11 @@ export function ResourceManagementView({
       </div>
 
       {/* High-Density Resource Inventory Table */}
-      <div className="bg-[#0B172D] border border-[#1A2D4F] rounded-xl overflow-hidden">
+      <div className="bg-white border border-sky-200/80 rounded-xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#1A2D4F] bg-[#081224] text-xs font-medium text-slate-400">
+              <tr className="border-b border-sky-200/80 bg-sky-50/70 text-xs font-medium text-slate-600">
                 <th className="py-3 px-4 whitespace-nowrap">Code</th>
                 <th className="py-3 px-4 whitespace-nowrap">Resource Name</th>
                 <th className="py-3 px-4 whitespace-nowrap">Category</th>
@@ -446,10 +448,10 @@ export function ResourceManagementView({
                 <th className="py-3 px-4 text-right whitespace-nowrap">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#152542] text-xs">
+            <tbody className="divide-y divide-sky-100 text-xs">
               {filteredRows.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-slate-400">
+                  <td colSpan={7} className="py-10 text-center text-slate-500">
                     No campus resources match the active filters.
                   </td>
                 </tr>
@@ -457,21 +459,21 @@ export function ResourceManagementView({
                 filteredRows.map((row) => (
                   <tr
                     key={`${row.category}-${row.id}`}
-                    className="hover:bg-[#0E1D38] transition-colors"
+                    className="hover:bg-sky-50/60 transition-colors"
                   >
-                    <td className="py-3 px-4 font-mono tabular-nums text-blue-300 font-medium whitespace-nowrap">
+                    <td className="py-3 px-4 font-mono tabular-nums text-sky-700 font-semibold whitespace-nowrap">
                       {row.code}
                     </td>
-                    <td className="py-3 px-4 font-medium text-white whitespace-nowrap">
+                    <td className="py-3 px-4 font-medium text-slate-900 whitespace-nowrap">
                       {row.name}
                     </td>
-                    <td className="py-3 px-4 text-slate-300 whitespace-nowrap">
+                    <td className="py-3 px-4 text-slate-600 whitespace-nowrap">
                       {row.categoryLabel}
                     </td>
-                    <td className="py-3 px-4 text-slate-300 whitespace-nowrap">
+                    <td className="py-3 px-4 text-slate-600 whitespace-nowrap">
                       {row.locationOrDept}
                     </td>
-                    <td className="py-3 px-4 text-slate-400 tabular-nums max-w-xs truncate">
+                    <td className="py-3 px-4 text-slate-500 tabular-nums max-w-xs truncate">
                       {row.capacityOrMeta}
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap">
@@ -490,7 +492,7 @@ export function ResourceManagementView({
                           <button
                             type="button"
                             onClick={() => onSimulateResourceFailure(row.category, row.id)}
-                            className="px-2.5 py-1 text-xs font-medium text-rose-300 hover:text-white bg-rose-500/10 hover:bg-rose-600/30 border border-rose-500/20 rounded transition-colors whitespace-nowrap"
+                            className="px-2.5 py-1 text-xs font-medium text-rose-700 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 rounded transition-colors whitespace-nowrap"
                           >
                             Simulate Failure
                           </button>
@@ -498,7 +500,7 @@ export function ResourceManagementView({
                         <button
                           type="button"
                           onClick={() => openEditModal(row.category, row.id)}
-                          className="p-1.5 text-slate-400 hover:text-white hover:bg-[#16294B] rounded transition-colors"
+                          className="p-1.5 text-slate-500 hover:text-sky-700 hover:bg-sky-100 rounded transition-colors"
                           aria-label={`Edit ${row.name}`}
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -506,7 +508,7 @@ export function ResourceManagementView({
                         <button
                           type="button"
                           onClick={() => handleDelete(row.category, row.id)}
-                          className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-[#16294B] rounded transition-colors"
+                          className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors"
                           aria-label={`Delete ${row.name}`}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -523,16 +525,16 @@ export function ResourceManagementView({
 
       {/* Add / Edit Resource Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
-          <div className="w-full max-w-lg bg-[#0B172D] border border-[#1E3358] rounded-xl overflow-hidden shadow-2xl">
-            <div className="px-5 py-4 border-b border-[#1A2D4F] flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
+          <div className="w-full max-w-lg bg-white border border-sky-200 rounded-xl overflow-hidden shadow-2xl">
+            <div className="px-5 py-4 border-b border-sky-100 bg-sky-50/50 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-slate-900">
                 {editingItem ? 'Edit Campus Resource' : 'Add Campus Resource'}
               </h3>
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-white rounded"
+                className="p-1 text-slate-500 hover:text-slate-900 rounded"
                 aria-label="Close modal"
               >
                 <X className="w-4 h-4" />
@@ -542,11 +544,11 @@ export function ResourceManagementView({
             <form onSubmit={handleSaveResource} className="p-5 space-y-4 text-xs">
               {!editingItem && (
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1.5">Resource Category</label>
+                  <label className="block text-slate-700 font-medium mb-1.5">Resource Category</label>
                   <select
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value as ResourceCategory)}
-                    className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900 focus:outline-none focus:border-sky-500"
                   >
                     <option value="classroom">Classroom</option>
                     <option value="lab">Laboratory</option>
@@ -559,7 +561,7 @@ export function ResourceManagementView({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1.5">
+                  <label className="block text-slate-700 font-medium mb-1.5">
                     {formCategory === 'faculty' ? 'ID / Code' : 'Resource Code'}
                   </label>
                   <input
@@ -568,15 +570,15 @@ export function ResourceManagementView({
                     onChange={(e) => setFormCode(e.target.value)}
                     placeholder={formCategory === 'lab' ? 'LAB-C3' : 'LH-104'}
                     disabled={Boolean(editingItem && formCategory === 'faculty')}
-                    className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white focus:outline-none focus:border-blue-500 disabled:opacity-60"
+                    className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900 focus:outline-none focus:border-sky-500 disabled:opacity-60"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1.5">Status</label>
+                  <label className="block text-slate-700 font-medium mb-1.5">Status</label>
                   <select
                     value={formStatus}
                     onChange={(e) => setFormStatus(e.target.value as ResourceStatus)}
-                    className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900 focus:outline-none focus:border-sky-500"
                   >
                     <option value="Operational">Operational</option>
                     <option value="Maintenance">Maintenance</option>
@@ -586,7 +588,7 @@ export function ResourceManagementView({
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1.5">
+                <label className="block text-slate-700 font-medium mb-1.5">
                   {formCategory === 'faculty'
                     ? 'Full Name'
                     : formCategory === 'bus'
@@ -599,7 +601,7 @@ export function ResourceManagementView({
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="Enter descriptive name"
-                  className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900 focus:outline-none focus:border-sky-500"
                 />
               </div>
 
@@ -607,11 +609,11 @@ export function ResourceManagementView({
                 <>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-slate-300 font-medium mb-1.5">Block</label>
+                      <label className="block text-slate-700 font-medium mb-1.5">Block</label>
                       <select
                         value={formBlock}
                         onChange={(e) => setFormBlock(e.target.value as CampusBlockId)}
-                        className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white"
+                        className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900"
                       >
                         <option value="BLK-A">Block A</option>
                         <option value="BLK-B">Block B</option>
@@ -619,43 +621,43 @@ export function ResourceManagementView({
                       </select>
                     </div>
                     <div>
-                      <label className="block text-slate-300 font-medium mb-1.5">Floor</label>
+                      <label className="block text-slate-700 font-medium mb-1.5">Floor</label>
                       <input
                         type="text"
                         value={formFloor}
                         onChange={(e) => setFormFloor(e.target.value)}
-                        className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white"
+                        className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-300 font-medium mb-1.5">Capacity</label>
+                      <label className="block text-slate-700 font-medium mb-1.5">Capacity</label>
                       <input
                         type="number"
                         min={10}
                         max={300}
                         value={formCapacity}
                         onChange={(e) => setFormCapacity(Number(e.target.value))}
-                        className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white font-mono"
+                        className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900 font-mono"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1.5">
+                    <label className="block text-slate-700 font-medium mb-1.5">
                       Installed Equipment (comma-separated)
                     </label>
                     <input
                       type="text"
                       value={formTags}
                       onChange={(e) => setFormTags(e.target.value)}
-                      className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white"
+                      className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900"
                     />
                   </div>
-                  <label className="flex items-center gap-2 text-slate-300 cursor-pointer">
+                  <label className="flex items-center gap-2 text-slate-700 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={formBackupPower}
                       onChange={(e) => setFormBackupPower(e.target.checked)}
-                      className="rounded border-[#1A2D4F] bg-[#071020]"
+                      className="rounded border-sky-300 text-sky-600"
                     />
                     <span>Connected to UPS / Diesel Backup Power</span>
                   </label>
@@ -666,33 +668,33 @@ export function ResourceManagementView({
                 <>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-slate-300 font-medium mb-1.5">Department</label>
+                      <label className="block text-slate-700 font-medium mb-1.5">Department</label>
                       <input
                         type="text"
                         value={formDept}
                         onChange={(e) => setFormDept(e.target.value)}
-                        className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white"
+                        className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-300 font-medium mb-1.5">Designation</label>
+                      <label className="block text-slate-700 font-medium mb-1.5">Designation</label>
                       <input
                         type="text"
                         value={formDesignation}
                         onChange={(e) => setFormDesignation(e.target.value)}
-                        className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white"
+                        className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1.5">
+                    <label className="block text-slate-700 font-medium mb-1.5">
                       Subject Qualifications (comma-separated)
                     </label>
                     <input
                       type="text"
                       value={formTags}
                       onChange={(e) => setFormTags(e.target.value)}
-                      className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white"
+                      className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900"
                     />
                   </div>
                 </>
@@ -701,32 +703,32 @@ export function ResourceManagementView({
               {formCategory === 'bus' && (
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1.5">Driver Name</label>
+                    <label className="block text-slate-700 font-medium mb-1.5">Driver Name</label>
                     <input
                       type="text"
                       value={formDriver}
                       onChange={(e) => setFormDriver(e.target.value)}
-                      className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white"
+                      className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1.5">Total Seats</label>
+                    <label className="block text-slate-700 font-medium mb-1.5">Total Seats</label>
                     <input
                       type="number"
                       min={15}
                       value={formCapacity}
                       onChange={(e) => setFormCapacity(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white font-mono"
+                      className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900 font-mono"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1.5">Assigned</label>
+                    <label className="block text-slate-700 font-medium mb-1.5">Assigned</label>
                     <input
                       type="number"
                       min={0}
                       value={formAssignedStudents}
                       onChange={(e) => setFormAssignedStudents(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white font-mono"
+                      className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900 font-mono"
                     />
                   </div>
                 </div>
@@ -735,20 +737,20 @@ export function ResourceManagementView({
               {formCategory === 'equipment' && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1.5">Equipment Type</label>
+                    <label className="block text-slate-700 font-medium mb-1.5">Equipment Type</label>
                     <input
                       type="text"
                       value={formEquipType}
                       onChange={(e) => setFormEquipType(e.target.value)}
-                      className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white"
+                      className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1.5">Assigned Room</label>
+                    <label className="block text-slate-700 font-medium mb-1.5">Assigned Room</label>
                     <select
                       value={formEquipLocation}
                       onChange={(e) => setFormEquipLocation(e.target.value)}
-                      className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white"
+                      className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900"
                     >
                       {state.rooms.map((r) => (
                         <option key={r.id} value={r.id}>
@@ -760,17 +762,17 @@ export function ResourceManagementView({
                 </div>
               )}
 
-              <div className="pt-3 border-t border-[#1A2D4F] flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-sky-100 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 text-xs font-medium text-slate-300 hover:text-white bg-[#112240] rounded-lg"
+                  className="px-4 py-2 text-xs font-medium text-slate-700 hover:text-slate-900 bg-sky-50 hover:bg-sky-100 rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-lg"
+                  className="px-4 py-2 text-xs font-medium text-white bg-sky-600 hover:bg-sky-700 rounded-lg"
                 >
                   {editingItem ? 'Save Changes' : 'Create Resource'}
                 </button>

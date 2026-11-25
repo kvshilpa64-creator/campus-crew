@@ -8,31 +8,31 @@
 @layer base {
   html {
     font-family: var(--font-sans);
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   body {
-    background-color: #060d1a;
-    color: #e2e8f0;
+    background-color: #f4f9ff;
+    color: #0f172a;
   }
 
-  /* Subtle dark scrollbar */
+  /* Subtle sky-tinted scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #081122;
+    background: #eef6ff;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #1e3358;
+    background: #bae6fd;
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #2c4a7c;
+    background: #7dd3fc;
   }
 }
 

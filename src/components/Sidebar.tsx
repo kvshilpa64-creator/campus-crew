@@ -41,21 +41,21 @@ export function Sidebar({
   onResetDemoData,
 }: SidebarProps) {
   const navContent = (
-    <div className="flex flex-col h-full bg-[#081224] border-r border-[#1A2D4F] text-slate-200 select-none">
+    <div className="flex flex-col h-full bg-white border-r border-sky-200/80 text-slate-800 select-none">
       {/* Brand Lockup */}
-      <div className="flex items-center justify-between px-5 py-5 border-b border-[#1A2D4F]">
+      <div className="flex items-center justify-between px-5 py-5 border-b border-sky-100 bg-sky-50/50">
         <div className="min-w-0">
-          <div className="text-base font-bold tracking-tight text-white whitespace-nowrap">
+          <div className="text-base font-bold tracking-tight text-sky-950 whitespace-nowrap">
             OMNIS-X
           </div>
-          <div className="text-xs text-slate-400 truncate">
+          <div className="text-xs text-sky-700 truncate">
             Campus Crew Digital Twin
           </div>
         </div>
         <button
           type="button"
           onClick={onCloseMobile}
-          className="lg:hidden p-2 rounded-md text-slate-400 hover:text-white hover:bg-[#10203D] focus-visible:outline-2 focus-visible:outline-blue-500"
+          className="lg:hidden p-2 rounded-md text-slate-500 hover:text-slate-900 hover:bg-sky-100 focus-visible:outline-2 focus-visible:outline-sky-600"
           aria-label="Close navigation menu"
         >
           <X className="w-5 h-5" />
@@ -78,21 +78,21 @@ export function Sidebar({
                 onSelectModule(item.id);
                 onCloseMobile();
               }}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-blue-500 ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-sky-600 ${
                 isActive
-                  ? 'bg-blue-600/20 text-blue-300 border border-blue-500/30'
-                  : 'text-slate-300 hover:text-white hover:bg-[#0F1F3A] border border-transparent'
+                  ? 'bg-sky-100 text-sky-900 border border-sky-300'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-sky-50 border border-transparent'
               }`}
             >
               <span className="flex items-center gap-3 min-w-0">
                 <Icon
-                  className={`w-4 h-4 shrink-0 ${isActive ? 'text-blue-400' : 'text-slate-400'}`}
+                  className={`w-4 h-4 shrink-0 ${isActive ? 'text-sky-600' : 'text-slate-400'}`}
                   aria-hidden="true"
                 />
                 <span className="truncate">{item.label}</span>
               </span>
               {showIncidentCount && (
-                <span className="font-mono text-xs tabular-nums text-rose-400 font-semibold ml-2">
+                <span className="font-mono text-xs tabular-nums text-rose-600 font-semibold ml-2">
                   {activeIncidentsCount}
                 </span>
               )}
@@ -102,22 +102,22 @@ export function Sidebar({
       </nav>
 
       {/* Campus Twin Summary & Reset Action */}
-      <div className="px-4 py-4 border-t border-[#1A2D4F] space-y-3">
+      <div className="px-4 py-4 border-t border-sky-100 bg-sky-50/30 space-y-3">
         <div className="flex items-center justify-between text-xs">
-          <span className="text-slate-400">Campus Integrity</span>
+          <span className="text-slate-600">Campus Integrity</span>
           <span
             className={`font-mono font-semibold tabular-nums ${
               systemHealthScore >= 94
-                ? 'text-emerald-400'
+                ? 'text-emerald-700'
                 : systemHealthScore >= 72
-                ? 'text-amber-400'
-                : 'text-rose-400'
+                ? 'text-amber-700'
+                : 'text-rose-700'
             }`}
           >
             {systemHealthScore}%
           </span>
         </div>
-        <div className="w-full h-1.5 bg-[#0F1F3A] rounded-full overflow-hidden">
+        <div className="w-full h-1.5 bg-sky-100 rounded-full overflow-hidden">
           <div
             className={`h-full transition-all duration-300 ${
               systemHealthScore >= 94
@@ -132,9 +132,9 @@ export function Sidebar({
         <button
           type="button"
           onClick={onResetDemoData}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-slate-300 bg-[#0E1B33] hover:bg-[#142646] border border-[#1E3358] rounded-lg transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-blue-500"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 bg-white hover:bg-sky-50 border border-sky-200 rounded-lg transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-sky-600"
         >
-          <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
+          <RotateCcw className="w-3.5 h-3.5 text-sky-600" aria-hidden="true" />
           <span>Reset Demo Data</span>
         </button>
       </div>
@@ -152,7 +152,7 @@ export function Sidebar({
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
+            className="fixed inset-0 bg-slate-900/35 backdrop-blur-xs"
             onClick={onCloseMobile}
             aria-hidden="true"
           />

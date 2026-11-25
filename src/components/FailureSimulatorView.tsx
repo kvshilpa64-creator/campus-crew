@@ -121,14 +121,12 @@ export function FailureSimulatorView({
     ];
   }, [scenarioType, state]);
 
-  // Keep targetId synchronized when scenarioType changes
   useEffect(() => {
     if (!targetOptions.some((opt) => opt.id === targetId)) {
       setTargetId(targetOptions[0]?.id ?? '');
     }
   }, [targetOptions, targetId]);
 
-  // Live pre-flight blast radius estimation using simulation engine (dry run without mutating state)
   const preview = useMemo(() => {
     if (!targetId) return null;
     try {
@@ -179,12 +177,12 @@ export function FailureSimulatorView({
 
   return (
     <div className="space-y-6">
-      {/* One-Click Realistic Hackathon Demo Presets */}
-      <div className="bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-5">
+      {/* One-Click Realistic Demo Presets */}
+      <div className="bg-white border border-sky-200/80 rounded-xl p-5 shadow-xs">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
           <div>
-            <h2 className="text-sm font-semibold text-white">Quick Failure Presets</h2>
-            <p className="text-xs text-slate-400">
+            <h2 className="text-sm font-semibold text-slate-900">Quick Failure Presets</h2>
+            <p className="text-xs text-slate-500">
               Load realistic campus disruption scenarios to test cascading impacts and feasibility checks
             </p>
           </div>
@@ -199,10 +197,10 @@ export function FailureSimulatorView({
                 'Chiller leak & GPU rack thermal shutdown in AI Lab B1'
               )
             }
-            className="text-left p-3.5 rounded-lg bg-[#081224] hover:bg-[#10213E] border border-[#1A2D4F] transition-colors"
+            className="text-left p-3.5 rounded-lg bg-sky-50/70 hover:bg-sky-100/80 border border-sky-200 transition-colors"
           >
-            <div className="text-xs font-semibold text-blue-300">AI Lab B1 Chiller Fault</div>
-            <div className="text-[11px] text-slate-400 mt-1">
+            <div className="text-xs font-semibold text-sky-900">AI Lab B1 Chiller Fault</div>
+            <div className="text-[11px] text-slate-600 mt-1">
               Tests GPU cluster relocation & timetable capacity checks
             </div>
           </button>
@@ -216,10 +214,10 @@ export function FailureSimulatorView({
                 'High-voltage bench trip in IoT & FPGA Lab B3'
               )
             }
-            className="text-left p-3.5 rounded-lg bg-[#081224] hover:bg-[#10213E] border border-[#1A2D4F] transition-colors"
+            className="text-left p-3.5 rounded-lg bg-amber-50/70 hover:bg-amber-100/70 border border-amber-200 transition-colors"
           >
-            <div className="text-xs font-semibold text-amber-300">IoT Lab B3 Hardware Lockout</div>
-            <div className="text-[11px] text-slate-400 mt-1">
+            <div className="text-xs font-semibold text-amber-900">IoT Lab B3 Hardware Lockout</div>
+            <div className="text-[11px] text-slate-600 mt-1">
               Demonstrates why same-slot lab swaps are Not Feasible
             </div>
           </button>
@@ -235,10 +233,10 @@ export function FailureSimulatorView({
                 'Mon'
               )
             }
-            className="text-left p-3.5 rounded-lg bg-[#081224] hover:bg-[#10213E] border border-[#1A2D4F] transition-colors"
+            className="text-left p-3.5 rounded-lg bg-rose-50/70 hover:bg-rose-100/70 border border-rose-200 transition-colors"
           >
-            <div className="text-xs font-semibold text-rose-300">Block B Power Outage (Mon)</div>
-            <div className="text-[11px] text-slate-400 mt-1">
+            <div className="text-xs font-semibold text-rose-900">Block B Power Outage (Mon)</div>
+            <div className="text-[11px] text-slate-600 mt-1">
               Multi-room cascade across Block B & cross-block recovery
             </div>
           </button>
@@ -252,10 +250,10 @@ export function FailureSimulatorView({
                 'Alternator failure on Route B-01 North Express at 07:45 AM'
               )
             }
-            className="text-left p-3.5 rounded-lg bg-[#081224] hover:bg-[#10213E] border border-[#1A2D4F] transition-colors"
+            className="text-left p-3.5 rounded-lg bg-sky-50/70 hover:bg-sky-100/80 border border-sky-200 transition-colors"
           >
-            <div className="text-xs font-semibold text-sky-300">Bus B-01 Breakdown</div>
-            <div className="text-[11px] text-slate-400 mt-1">
+            <div className="text-xs font-semibold text-sky-900">Bus B-01 Breakdown</div>
+            <div className="text-[11px] text-slate-600 mt-1">
               Strands 48 morning commuters; evaluates reserve shuttle & hybrid shifts
             </div>
           </button>
@@ -266,11 +264,11 @@ export function FailureSimulatorView({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <form
           onSubmit={handleTrigger}
-          className="lg:col-span-7 bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-5 space-y-5"
+          className="lg:col-span-7 bg-white border border-sky-200/80 rounded-xl p-5 space-y-5 shadow-xs"
         >
           <div>
-            <h2 className="text-sm font-semibold text-white">Configure Failure Scenario</h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <h2 className="text-sm font-semibold text-slate-900">Configure Failure Scenario</h2>
+            <p className="text-xs text-slate-500 mt-0.5">
               Select a disruption category, target campus asset, and time window
             </p>
           </div>
@@ -287,18 +285,18 @@ export function FailureSimulatorView({
                   onClick={() => setScenarioType(card.type)}
                   className={`text-left p-3.5 rounded-lg border transition-colors ${
                     selected
-                      ? 'bg-blue-600/15 border-blue-500 text-white'
-                      : 'bg-[#081224] border-[#1A2D4F] text-slate-300 hover:border-[#2A477A]'
+                      ? 'bg-sky-50 border-sky-500 text-sky-950'
+                      : 'bg-white border-sky-200/80 text-slate-700 hover:bg-sky-50/40 hover:border-sky-300'
                   }`}
                 >
                   <div className="flex items-center gap-2 text-xs font-semibold">
                     <Icon
-                      className={`w-4 h-4 shrink-0 ${selected ? 'text-blue-400' : 'text-slate-400'}`}
+                      className={`w-4 h-4 shrink-0 ${selected ? 'text-sky-600' : 'text-slate-400'}`}
                       aria-hidden="true"
                     />
                     <span>{card.label}</span>
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                  <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
                     {card.description}
                   </p>
                 </button>
@@ -307,16 +305,16 @@ export function FailureSimulatorView({
           </div>
 
           {/* Target Resource & Scope */}
-          <div className="space-y-4 pt-2 border-t border-[#1A2D4F] text-xs">
+          <div className="space-y-4 pt-2 border-t border-sky-100 text-xs">
             <div>
-              <label htmlFor="sim-target" className="block text-slate-300 font-medium mb-1.5">
+              <label htmlFor="sim-target" className="block text-slate-700 font-medium mb-1.5">
                 Target Resource / Zone
               </label>
               <select
                 id="sim-target"
                 value={targetId}
                 onChange={(e) => setTargetId(e.target.value)}
-                className="w-full px-3 py-2.5 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2.5 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900 focus:outline-none focus:border-sky-500"
               >
                 {targetOptions.map((opt) => (
                   <option key={opt.id} value={opt.id}>
@@ -328,7 +326,7 @@ export function FailureSimulatorView({
 
             {scenarioType === 'power_internet_failure' && (
               <div>
-                <label className="block text-slate-300 font-medium mb-1.5">
+                <label className="block text-slate-700 font-medium mb-1.5">
                   Infrastructure Failure Type
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -343,8 +341,8 @@ export function FailureSimulatorView({
                       onClick={() => setSubType(opt.id as PowerInternetSubtype)}
                       className={`px-3 py-2 rounded-lg border text-xs font-medium transition-colors ${
                         subType === opt.id
-                          ? 'bg-blue-600 text-white border-blue-500'
-                          : 'bg-[#071020] text-slate-300 border-[#1A2D4F] hover:border-[#2A477A]'
+                          ? 'bg-sky-600 text-white border-sky-600'
+                          : 'bg-sky-50/40 text-slate-700 border-sky-200 hover:bg-sky-100/60'
                       }`}
                     >
                       {opt.label}
@@ -356,14 +354,14 @@ export function FailureSimulatorView({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label htmlFor="sim-day" className="block text-slate-300 font-medium mb-1.5">
+                <label htmlFor="sim-day" className="block text-slate-700 font-medium mb-1.5">
                   Day Window
                 </label>
                 <select
                   id="sim-day"
                   value={dayFilter}
                   onChange={(e) => setDayFilter(e.target.value as DayOfWeek | 'ALL')}
-                  className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900 focus:outline-none focus:border-sky-500"
                 >
                   <option value="ALL">Entire Week (Mon–Fri)</option>
                   {DAYS_OF_WEEK.map((d) => (
@@ -375,14 +373,14 @@ export function FailureSimulatorView({
               </div>
 
               <div>
-                <label htmlFor="sim-slot" className="block text-slate-300 font-medium mb-1.5">
+                <label htmlFor="sim-slot" className="block text-slate-700 font-medium mb-1.5">
                   Time Slot Window
                 </label>
                 <select
                   id="sim-slot"
                   value={timeSlotFilter}
                   onChange={(e) => setTimeSlotFilter(e.target.value as TimeSlotCode | 'ALL')}
-                  className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900 focus:outline-none focus:border-sky-500"
                 >
                   <option value="ALL">All Daily Time Slots</option>
                   {TIME_SLOTS.map((t) => (
@@ -395,7 +393,7 @@ export function FailureSimulatorView({
             </div>
 
             <div>
-              <label htmlFor="sim-notes" className="block text-slate-300 font-medium mb-1.5">
+              <label htmlFor="sim-notes" className="block text-slate-700 font-medium mb-1.5">
                 Root Cause / Incident Notes
               </label>
               <input
@@ -404,13 +402,13 @@ export function FailureSimulatorView({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="e.g., HVAC coolant leak or substation breaker trip"
-                className="w-full px-3 py-2 bg-[#071020] border border-[#1A2D4F] rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 bg-sky-50/40 border border-sky-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-sky-500"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-500 rounded-lg transition-colors"
+              className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors shadow-xs"
             >
               <Play className="w-4 h-4" aria-hidden="true" />
               <span>Run Failure Simulation</span>
@@ -419,44 +417,44 @@ export function FailureSimulatorView({
         </form>
 
         {/* Live Estimated Blast Radius Preview */}
-        <div className="lg:col-span-5 bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-[#1A2D4F] pb-3">
+        <div className="lg:col-span-5 bg-white border border-sky-200/80 rounded-xl p-5 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-sky-100 pb-3">
             <div>
-              <h3 className="text-sm font-semibold text-white">Estimated Blast Radius</h3>
-              <p className="text-xs text-slate-400">Live dependency preview before committing</p>
+              <h3 className="text-sm font-semibold text-slate-900">Estimated Blast Radius</h3>
+              <p className="text-xs text-slate-500">Live dependency preview before committing</p>
             </div>
-            <AlertTriangle className="w-4 h-4 text-amber-400" aria-hidden="true" />
+            <AlertTriangle className="w-4 h-4 text-amber-600" aria-hidden="true" />
           </div>
 
           {preview ? (
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-3 text-center">
-                <div className="p-3 rounded-lg bg-[#081224] border border-[#182B4B]">
-                  <div className="text-xl font-semibold font-mono tabular-nums text-white">
+                <div className="p-3 rounded-lg bg-sky-50/70 border border-sky-200/80">
+                  <div className="text-xl font-semibold font-mono tabular-nums text-slate-900">
                     {preview.affectedClassesCount}
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">Classes Hit</div>
+                  <div className="text-[11px] text-slate-600 mt-0.5">Classes Hit</div>
                 </div>
-                <div className="p-3 rounded-lg bg-[#081224] border border-[#182B4B]">
-                  <div className="text-xl font-semibold font-mono tabular-nums text-white">
+                <div className="p-3 rounded-lg bg-sky-50/70 border border-sky-200/80">
+                  <div className="text-xl font-semibold font-mono tabular-nums text-slate-900">
                     {preview.affectedStudentsCount}
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">Students</div>
+                  <div className="text-[11px] text-slate-600 mt-0.5">Students</div>
                 </div>
-                <div className="p-3 rounded-lg bg-[#081224] border border-[#182B4B]">
-                  <div className="text-xl font-semibold font-mono tabular-nums text-white">
+                <div className="p-3 rounded-lg bg-sky-50/70 border border-sky-200/80">
+                  <div className="text-xl font-semibold font-mono tabular-nums text-slate-900">
                     {preview.affectedResources.length}
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">Assets Down</div>
+                  <div className="text-[11px] text-slate-600 mt-0.5">Assets Down</div>
                 </div>
               </div>
 
               <div>
-                <div className="text-xs font-medium text-slate-300 mb-2">
+                <div className="text-xs font-medium text-slate-700 mb-2">
                   Affected Sessions Preview
                 </div>
                 {preview.affectedOperations.length === 0 ? (
-                  <p className="text-xs text-slate-400 p-3 rounded-lg bg-[#081224] border border-[#182B4B]">
+                  <p className="text-xs text-slate-500 p-3 rounded-lg bg-sky-50/50 border border-sky-100">
                     No scheduled timetable classes fall within the selected target and time window.
                   </p>
                 ) : (
@@ -466,22 +464,22 @@ export function FailureSimulatorView({
                       return (
                         <div
                           key={op.id}
-                          className="p-3 rounded-lg bg-[#081224] border border-[#182B4B] text-xs space-y-1"
+                          className="p-3 rounded-lg bg-sky-50/50 border border-sky-200/70 text-xs space-y-1"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-mono text-blue-300 font-medium">
+                            <span className="font-mono text-sky-700 font-semibold">
                               {op.courseCode} · {op.day} {op.timeSlot}
                             </span>
                             <span
                               className={`font-medium ${
-                                feasibleCount > 0 ? 'text-emerald-400' : 'text-rose-400'
+                                feasibleCount > 0 ? 'text-emerald-700' : 'text-rose-700'
                               }`}
                             >
                               {feasibleCount} feasible plan{feasibleCount === 1 ? '' : 's'}
                             </span>
                           </div>
-                          <div className="text-slate-200">{op.courseName}</div>
-                          <div className="text-slate-400">
+                          <div className="text-slate-900 font-medium">{op.courseName}</div>
+                          <div className="text-slate-600">
                             {op.batchName} · {op.originalRoomName}
                           </div>
                         </div>
@@ -492,7 +490,7 @@ export function FailureSimulatorView({
               </div>
             </div>
           ) : (
-            <div className="text-xs text-slate-400 py-6 text-center">
+            <div className="text-xs text-slate-500 py-6 text-center">
               Select a valid target resource to compute impact preview.
             </div>
           )}

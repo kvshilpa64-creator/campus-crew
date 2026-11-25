@@ -100,62 +100,62 @@ export function DashboardView({
     <div className="space-y-6">
       {/* Top 4 Primary Campus Inventory Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div className="bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-5">
-          <div className="text-xs font-medium text-slate-400">Total Classrooms</div>
+        <div className="bg-white border border-sky-200/80 rounded-xl p-5 shadow-xs">
+          <div className="text-xs font-medium text-slate-500">Total Classrooms</div>
           <div className="mt-2 flex items-baseline justify-between">
-            <span className="text-3xl font-semibold text-white font-mono tabular-nums">
+            <span className="text-3xl font-semibold text-slate-900 font-mono tabular-nums">
               {classrooms.length}
             </span>
-            <span className="text-xs text-slate-400 tabular-nums">
+            <span className="text-xs text-sky-700 font-medium tabular-nums">
               {opClassrooms} operational
             </span>
           </div>
-          <div className="mt-3 text-xs text-slate-400">
+          <div className="mt-3 text-xs text-slate-500">
             Blocks A, B & C · {classrooms.reduce((s, r) => s + r.capacity, 0)} seats
           </div>
         </div>
 
-        <div className="bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-5">
-          <div className="text-xs font-medium text-slate-400">Laboratories</div>
+        <div className="bg-white border border-sky-200/80 rounded-xl p-5 shadow-xs">
+          <div className="text-xs font-medium text-slate-500">Laboratories</div>
           <div className="mt-2 flex items-baseline justify-between">
-            <span className="text-3xl font-semibold text-white font-mono tabular-nums">
+            <span className="text-3xl font-semibold text-slate-900 font-mono tabular-nums">
               {labs.length}
             </span>
-            <span className="text-xs text-slate-400 tabular-nums">
+            <span className="text-xs text-sky-700 font-medium tabular-nums">
               {opLabs} operational
             </span>
           </div>
-          <div className="mt-3 text-xs text-slate-400">
+          <div className="mt-3 text-xs text-slate-500">
             AI/GPU · Networks · IoT · Robotics
           </div>
         </div>
 
-        <div className="bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-5">
-          <div className="text-xs font-medium text-slate-400">Active Faculty</div>
+        <div className="bg-white border border-sky-200/80 rounded-xl p-5 shadow-xs">
+          <div className="text-xs font-medium text-slate-500">Active Faculty</div>
           <div className="mt-2 flex items-baseline justify-between">
-            <span className="text-3xl font-semibold text-white font-mono tabular-nums">
+            <span className="text-3xl font-semibold text-slate-900 font-mono tabular-nums">
               {state.faculty.length}
             </span>
-            <span className="text-xs text-slate-400 tabular-nums">
+            <span className="text-xs text-sky-700 font-medium tabular-nums">
               {opFaculty} available
             </span>
           </div>
-          <div className="mt-3 text-xs text-slate-400">
+          <div className="mt-3 text-xs text-slate-500">
             {state.courses.length} active courses scheduled
           </div>
         </div>
 
-        <div className="bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-5">
-          <div className="text-xs font-medium text-slate-400">Enrolled Students</div>
+        <div className="bg-white border border-sky-200/80 rounded-xl p-5 shadow-xs">
+          <div className="text-xs font-medium text-slate-500">Enrolled Students</div>
           <div className="mt-2 flex items-baseline justify-between">
-            <span className="text-3xl font-semibold text-white font-mono tabular-nums">
+            <span className="text-3xl font-semibold text-slate-900 font-mono tabular-nums">
               {health.totalStudents}
             </span>
-            <span className="text-xs text-slate-400 tabular-nums">
+            <span className="text-xs text-sky-700 font-medium tabular-nums">
               {state.batches.length} cohorts
             </span>
           </div>
-          <div className="mt-3 text-xs text-slate-400">
+          <div className="mt-3 text-xs text-slate-500">
             {state.batches.reduce((s, b) => s + b.commuterCount, 0)} bus commuters tracked
           </div>
         </div>
@@ -163,16 +163,16 @@ export function DashboardView({
 
       {/* Operational Health & Incident Strip (3 columns) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-5 flex items-center justify-between">
+        <div className="bg-white border border-sky-200/80 rounded-xl p-5 flex items-center justify-between shadow-xs">
           <div>
-            <div className="text-xs font-medium text-slate-400">System Health</div>
+            <div className="text-xs font-medium text-slate-500">System Health</div>
             <div className="mt-1.5 flex items-baseline gap-3">
-              <span className="text-3xl font-semibold font-mono tabular-nums text-white">
+              <span className="text-3xl font-semibold font-mono tabular-nums text-slate-900">
                 {health.healthScore}%
               </span>
               <StatusLabel status={health.statusLabel} />
             </div>
-            <div className="mt-2 text-xs text-slate-400 tabular-nums">
+            <div className="mt-2 text-xs text-slate-500 tabular-nums">
               {health.operationalResources}/{health.totalResources} resources online
             </div>
           </div>
@@ -182,7 +182,7 @@ export function DashboardView({
               cy="32"
               r="26"
               fill="none"
-              stroke="#142646"
+              stroke="#E0F2FE"
               strokeWidth="6"
             />
             <circle
@@ -205,32 +205,32 @@ export function DashboardView({
           </svg>
         </div>
 
-        <div className="bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-5 flex flex-col justify-between">
+        <div className="bg-white border border-sky-200/80 rounded-xl p-5 flex flex-col justify-between shadow-xs">
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-xs font-medium text-slate-400">Active Incidents</div>
-              <div className="mt-1.5 text-3xl font-semibold font-mono tabular-nums text-white">
+              <div className="text-xs font-medium text-slate-500">Active Incidents</div>
+              <div className="mt-1.5 text-3xl font-semibold font-mono tabular-nums text-slate-900">
                 {health.activeIncidentsCount}
               </div>
             </div>
             <button
               type="button"
               onClick={() => onNavigate('simulator')}
-              className="px-3 py-1.5 text-xs font-medium text-blue-300 bg-blue-600/15 hover:bg-blue-600/25 border border-blue-500/30 rounded-lg transition-colors whitespace-nowrap shrink-0"
+              className="px-3 py-1.5 text-xs font-medium text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg transition-colors whitespace-nowrap shrink-0"
             >
               Run Simulation
             </button>
           </div>
-          <div className="mt-2 text-xs text-slate-400 tabular-nums">
+          <div className="mt-2 text-xs text-slate-500 tabular-nums">
             {state.incidents.filter((i) => i.status === 'Resolved').length} resolved in ledger
           </div>
         </div>
 
-        <div className="bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-5 flex flex-col justify-between">
+        <div className="bg-white border border-sky-200/80 rounded-xl p-5 flex flex-col justify-between shadow-xs">
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-xs font-medium text-slate-400">Affected Classes</div>
-              <div className="mt-1.5 text-3xl font-semibold font-mono tabular-nums text-white">
+              <div className="text-xs font-medium text-slate-500">Affected Classes</div>
+              <div className="mt-1.5 text-3xl font-semibold font-mono tabular-nums text-slate-900">
                 {health.affectedClassesCount}
               </div>
             </div>
@@ -238,7 +238,7 @@ export function DashboardView({
               <button
                 type="button"
                 onClick={() => onNavigate('recovery')}
-                className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors whitespace-nowrap shrink-0"
+                className="px-3 py-1.5 text-xs font-medium text-white bg-sky-600 hover:bg-sky-700 rounded-lg transition-colors whitespace-nowrap shrink-0"
               >
                 Open Planner
               </button>
@@ -246,13 +246,13 @@ export function DashboardView({
               <button
                 type="button"
                 onClick={() => onNavigate('dependencies')}
-                className="px-3 py-1.5 text-xs font-medium text-slate-300 bg-[#112240] hover:bg-[#162C52] border border-[#1E3358] rounded-lg transition-colors whitespace-nowrap shrink-0"
+                className="px-3 py-1.5 text-xs font-medium text-sky-900 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg transition-colors whitespace-nowrap shrink-0"
               >
                 View Map
               </button>
             )}
           </div>
-          <div className="mt-2 text-xs text-slate-400 tabular-nums">
+          <div className="mt-2 text-xs text-slate-500 tabular-nums">
             {health.affectedStudentsCount > 0
               ? `${health.affectedStudentsCount} students impacted across unmitigated sessions`
               : `All ${state.timetable.length} weekly sessions running on schedule`}
@@ -263,20 +263,20 @@ export function DashboardView({
       {/* Charts Section: Resource Readiness + Weekly Load */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Category Readiness */}
-        <div className="lg:col-span-6 bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-5">
+        <div className="lg:col-span-6 bg-white border border-sky-200/80 rounded-xl p-5 shadow-xs">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="text-sm font-semibold text-white">
+              <h2 className="text-sm font-semibold text-slate-900">
                 Resource Readiness by Category
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5">
                 Live operational availability across all tracked campus assets
               </p>
             </div>
             <button
               type="button"
               onClick={() => onNavigate('resources')}
-              className="text-xs font-medium text-blue-400 hover:text-blue-300 whitespace-nowrap shrink-0"
+              className="text-xs font-medium text-sky-600 hover:text-sky-700 whitespace-nowrap shrink-0"
             >
               Manage Resources
             </button>
@@ -291,19 +291,19 @@ export function DashboardView({
               return (
                 <div key={cat.label} className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-slate-200">{cat.label}</span>
-                    <div className="flex items-center gap-3 font-mono tabular-nums text-slate-400">
-                      <span className="text-emerald-400">{cat.operational} ok</span>
+                    <span className="font-medium text-slate-800">{cat.label}</span>
+                    <div className="flex items-center gap-3 font-mono tabular-nums text-slate-500">
+                      <span className="text-emerald-700 font-medium">{cat.operational} ok</span>
                       {cat.maintenance > 0 && (
-                        <span className="text-amber-400">{cat.maintenance} maint</span>
+                        <span className="text-amber-700 font-medium">{cat.maintenance} maint</span>
                       )}
                       {cat.unavailable > 0 && (
-                        <span className="text-rose-400">{cat.unavailable} down</span>
+                        <span className="text-rose-700 font-medium">{cat.unavailable} down</span>
                       )}
                       <span>/ {cat.total}</span>
                     </div>
                   </div>
-                  <div className="w-full h-2.5 bg-[#071020] rounded-sm overflow-hidden flex">
+                  <div className="w-full h-2.5 bg-sky-100 rounded-sm overflow-hidden flex">
                     <div
                       className="bg-emerald-500 transition-all duration-300"
                       style={{ width: `${opPct}%` }}
@@ -323,35 +323,35 @@ export function DashboardView({
           </div>
         </div>
 
-        {/* Weekly Timetable Load SVG Bar Chart */}
-        <div className="lg:col-span-6 bg-[#0B172D] border border-[#1A2D4F] rounded-xl p-5 flex flex-col justify-between">
+        {/* Weekly Timetable Load Bar Chart */}
+        <div className="lg:col-span-6 bg-white border border-sky-200/80 rounded-xl p-5 flex flex-col justify-between shadow-xs">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div>
-              <h2 className="text-sm font-semibold text-white">
+              <h2 className="text-sm font-semibold text-slate-900">
                 Weekly Academic Load by Campus Block
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5">
                 Scheduled timetable sessions across Block A, Block B, and Block C
               </p>
             </div>
-            <div className="flex items-center gap-3 text-xs text-slate-400 shrink-0">
+            <div className="flex items-center gap-3 text-xs text-slate-600 shrink-0">
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-xs bg-blue-500" />
+                <span className="w-2.5 h-2.5 rounded-xs bg-sky-700" />
                 Blk A
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-xs bg-sky-400" />
+                <span className="w-2.5 h-2.5 rounded-xs bg-sky-500" />
                 Blk B
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-xs bg-indigo-400" />
+                <span className="w-2.5 h-2.5 rounded-xs bg-sky-300" />
                 Blk C
               </span>
             </div>
           </div>
 
           <div className="relative pt-2">
-            <div className="grid grid-cols-5 gap-4 items-end h-44 border-b border-[#1A2D4F] pb-2">
+            <div className="grid grid-cols-5 gap-4 items-end h-44 border-b border-sky-100 pb-2">
               {weeklyLoad.map((d) => {
                 const aHeight = (d.blockA / maxDaySessions) * 100;
                 const bHeight = (d.blockB / maxDaySessions) * 100;
@@ -364,30 +364,30 @@ export function DashboardView({
                     onMouseLeave={() => setHoveredDay(null)}
                     className="h-full flex flex-col justify-end items-center group cursor-default"
                   >
-                    <div className="text-xs font-mono tabular-nums text-slate-300 mb-1.5">
+                    <div className="text-xs font-mono tabular-nums text-slate-700 font-medium mb-1.5">
                       {d.total}
                       {d.impacted > 0 && (
-                        <span className="text-rose-400 ml-1">({d.impacted}!)</span>
+                        <span className="text-rose-600 ml-1">({d.impacted}!)</span>
                       )}
                     </div>
                     <div className="w-full max-w-[46px] h-full flex flex-col justify-end gap-0.5">
                       {d.blockC > 0 && (
                         <div
-                          className="w-full bg-indigo-400/90 rounded-t-xs transition-opacity group-hover:opacity-100"
+                          className="w-full bg-sky-300 rounded-t-xs transition-opacity group-hover:opacity-90"
                           style={{ height: `${cHeight}%` }}
                           title={`Block C: ${d.blockC} sessions`}
                         />
                       )}
                       {d.blockB > 0 && (
                         <div
-                          className="w-full bg-sky-400/90 transition-opacity group-hover:opacity-100"
+                          className="w-full bg-sky-500 transition-opacity group-hover:opacity-90"
                           style={{ height: `${bHeight}%` }}
                           title={`Block B: ${d.blockB} sessions`}
                         />
                       )}
                       {d.blockA > 0 && (
                         <div
-                          className="w-full bg-blue-600/95 rounded-b-xs transition-opacity group-hover:opacity-100"
+                          className="w-full bg-sky-700 rounded-b-xs transition-opacity group-hover:opacity-90"
                           style={{ height: `${aHeight}%` }}
                           title={`Block A: ${d.blockA} sessions`}
                         />
@@ -399,18 +399,18 @@ export function DashboardView({
             </div>
             <div className="grid grid-cols-5 gap-4 pt-2 text-center">
               {weeklyLoad.map((d) => (
-                <div key={d.day} className="text-xs font-medium text-slate-400">
+                <div key={d.day} className="text-xs font-medium text-slate-600">
                   {d.day}
                 </div>
               ))}
             </div>
-            <div className="mt-3 h-5 text-xs text-slate-400">
+            <div className="mt-3 h-5 text-xs text-slate-500">
               {hoveredDay ? (
                 (() => {
                   const info = weeklyLoad.find((x) => x.day === hoveredDay);
                   if (!info) return null;
                   return (
-                    <span className="tabular-nums">
+                    <span className="tabular-nums text-sky-900 font-medium">
                       {info.day}: {info.total} sessions · Block A ({info.blockA}) · Block B ({info.blockB}) · Block C ({info.blockC})
                       {info.impacted > 0 ? ` · ${info.impacted} impacted` : ''}
                     </span>
@@ -425,20 +425,20 @@ export function DashboardView({
       </div>
 
       {/* Active Incidents / Operational Readiness Feed */}
-      <div className="bg-[#0B172D] border border-[#1A2D4F] rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#1A2D4F] flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white border border-sky-200/80 rounded-xl overflow-hidden shadow-xs">
+        <div className="px-5 py-4 border-b border-sky-100 bg-sky-50/40 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-sm font-semibold text-white">
+            <h2 className="text-sm font-semibold text-slate-900">
               Active Incident Queue & Mitigation Status
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Real-time operational disruptions requiring impact inspection or recovery actions
             </p>
           </div>
           <button
             type="button"
             onClick={() => onNavigate('simulator')}
-            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-sky-600 hover:bg-sky-700 rounded-lg transition-colors whitespace-nowrap shrink-0"
           >
             <Play className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Trigger Failure Simulation</span>
@@ -448,12 +448,12 @@ export function DashboardView({
         {activeIncidents.length === 0 ? (
           <div className="px-6 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" aria-hidden="true" />
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" aria-hidden="true" />
               <div>
-                <div className="text-sm font-medium text-white">
+                <div className="text-sm font-semibold text-slate-900">
                   All campus operations nominal
                 </div>
-                <p className="text-xs text-slate-400 mt-1 max-w-xl">
+                <p className="text-xs text-slate-600 mt-1 max-w-xl">
                   Zero active disruptions detected across Block A, Block B, Block C, and campus transit routes. Launch a failure scenario in the simulator to test cascading impact analysis and recovery planning.
                 </p>
               </div>
@@ -461,29 +461,29 @@ export function DashboardView({
             <button
               type="button"
               onClick={() => onNavigate('dependencies')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-slate-200 bg-[#112240] hover:bg-[#172E56] border border-[#1E3358] rounded-lg transition-colors whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-sky-900 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg transition-colors whitespace-nowrap shrink-0"
             >
               <span>Inspect Dependency Graph</span>
               <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-[#1A2D4F]">
+          <div className="divide-y divide-sky-100">
             {activeIncidents.map((inc) => {
               const mitigatedCount = inc.affectedOperations.filter((o) => o.appliedRecovery).length;
               return (
                 <div
                   key={inc.id}
-                  className="px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-[#0E1D38] transition-colors"
+                  className="px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-sky-50/50 transition-colors"
                 >
                   <div className="space-y-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2.5">
-                      <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" aria-hidden="true" />
-                      <span className="font-mono text-xs text-slate-400 tabular-nums">{inc.id}</span>
-                      <span className="text-sm font-semibold text-white">{inc.title}</span>
+                      <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" aria-hidden="true" />
+                      <span className="font-mono text-xs text-slate-500 tabular-nums">{inc.id}</span>
+                      <span className="text-sm font-semibold text-slate-900">{inc.title}</span>
                       <StatusLabel status={inc.status} />
                     </div>
-                    <div className="text-xs text-slate-400 flex flex-wrap items-center gap-2 tabular-nums">
+                    <div className="text-xs text-slate-600 flex flex-wrap items-center gap-2 tabular-nums">
                       <span>{inc.affectedClassesCount} affected classes</span>
                       <span aria-hidden="true">·</span>
                       <span>{inc.affectedStudentsCount} students</span>
@@ -499,14 +499,14 @@ export function DashboardView({
                     <button
                       type="button"
                       onClick={() => onInspectIncident(inc.id, 'impact')}
-                      className="px-3 py-1.5 text-xs font-medium text-slate-200 bg-[#112240] hover:bg-[#172E56] border border-[#1E3358] rounded-lg transition-colors whitespace-nowrap"
+                      className="px-3 py-1.5 text-xs font-medium text-sky-900 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg transition-colors whitespace-nowrap"
                     >
                       Impact Chain
                     </button>
                     <button
                       type="button"
                       onClick={() => onInspectIncident(inc.id, 'recovery')}
-                      className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors whitespace-nowrap"
+                      className="px-3 py-1.5 text-xs font-medium text-white bg-sky-600 hover:bg-sky-700 rounded-lg transition-colors whitespace-nowrap"
                     >
                       Recovery Planner
                     </button>
