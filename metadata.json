@@ -1,0 +1,6 @@
+{
+  "name": "OMNIS-X – Campus Crew Digital Twin",
+  "description": "Operational digital twin for college campuses that models resources, dependencies, failure simulations, cascading impact analysis, and constraint-verified recovery planning.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
