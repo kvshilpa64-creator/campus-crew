@@ -4,7 +4,9 @@ import {
   Boxes,
   GitBranch,
   History,
+  KeyRound,
   LayoutDashboard,
+  LogOut,
   RotateCcw,
   ShieldCheck,
   X,
@@ -19,6 +21,9 @@ interface SidebarProps {
   mobileOpen: boolean;
   onCloseMobile: () => void;
   onResetDemoData: () => void;
+  adminEmail: string;
+  onOpenChangePassword: () => void;
+  onSignOut: () => void;
 }
 
 const NAV_ITEMS: { id: AppModuleId; label: string; icon: typeof LayoutDashboard }[] = [
@@ -39,6 +44,9 @@ export function Sidebar({
   mobileOpen,
   onCloseMobile,
   onResetDemoData,
+  adminEmail,
+  onOpenChangePassword,
+  onSignOut,
 }: SidebarProps) {
   const navContent = (
     <div className="flex flex-col h-full bg-white border-r border-sky-200/80 text-slate-800 select-none">
@@ -101,7 +109,7 @@ export function Sidebar({
         })}
       </nav>
 
-      {/* Campus Twin Summary & Reset Action */}
+      {/* Campus Twin Summary, Admin Account & Actions */}
       <div className="px-4 py-4 border-t border-sky-100 bg-sky-50/30 space-y-3">
         <div className="flex items-center justify-between text-xs">
           <span className="text-slate-600">Campus Integrity</span>
@@ -129,6 +137,31 @@ export function Sidebar({
             style={{ width: `${systemHealthScore}%` }}
           />
         </div>
+
+        <div className="pt-2 border-t border-sky-100 space-y-2">
+          <div className="text-[11px] text-slate-500 truncate" title={adminEmail}>
+            Admin: <span className="font-medium text-slate-800">{adminEmail}</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={onOpenChangePassword}
+              className="flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-sky-900 bg-white hover:bg-sky-50 border border-sky-200 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <KeyRound className="w-3 h-3 text-sky-600 shrink-0" aria-hidden="true" />
+              <span>Password</span>
+            </button>
+            <button
+              type="button"
+              onClick={onSignOut}
+              className="flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-slate-700 bg-white hover:bg-rose-50 hover:text-rose-700 border border-sky-200 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <LogOut className="w-3 h-3 shrink-0" aria-hidden="true" />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+
         <button
           type="button"
           onClick={onResetDemoData}

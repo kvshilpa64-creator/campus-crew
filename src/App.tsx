@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Menu, Play } from 'lucide-react';
+import { AdminLoginView } from './components/AdminLoginView';
+import { ChangePasswordModal } from './components/ChangePasswordModal';
 import { DashboardView } from './components/DashboardView';
 import { DependencyMappingView } from './components/DependencyMappingView';
 import { FailureSimulatorView } from './components/FailureSimulatorView';
@@ -34,7 +36,7 @@ const MODULE_META: Record<AppModuleId, { title: string; subtitle: string }> = {
   },
   dependencies: {
     title: 'Dependency Mapping',
-    subtitle: 'Interactive graph and timetable matrix linking faculty, rooms, courses, and student cohorts',
+    subtitle: 'Simple dependency chains linking faculty, rooms, courses, and student cohorts',
   },
   simulator: {
     title: 'Failure Simulator',
@@ -55,6 +57,10 @@ const MODULE_META: Record<AppModuleId, { title: string; subtitle: string }> = {
 };
 
 export default function App() {
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [adminEmail, setAdminEmail] = useState<string | null>(null);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+
   const [state, setState] = useState<CampusState>(() => loadCampusState());
   const [activeModule, setActiveModule] = useState<AppModuleId>('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -76,6 +82,29 @@ export default function App() {
   }, [bannerMessage]);
 
   const health = useMemo(() => computeSystemHealth(state), [state]);
+
+  const handleAuthenticated = (token: string, email: string) => {
+    setAuthToken(token);
+    setAdminEmail(email);
+    setBannerMessage(`Signed in as ${email}.`);
+  };
+
+  const handleSignOut = async () => {
+    const currentToken = authToken;
+    setAuthToken(null);
+    setAdminEmail(null);
+    setPasswordModalOpen(false);
+    if (currentToken) {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${currentToken}` },
+        });
+      } catch {
+        // Ignore network errors on sign out
+      }
+    }
+  };
 
   const handleRunSimulation = (req: SimulationRequest) => {
     const { incident, nextState } = simulateFailure(req, state);
@@ -134,6 +163,10 @@ export default function App() {
     setActiveModule(targetMod);
   };
 
+  if (!authToken || !adminEmail) {
+    return <AdminLoginView onAuthenticated={handleAuthenticated} />;
+  }
+
   const meta = MODULE_META[activeModule];
 
   return (
@@ -146,6 +179,9 @@ export default function App() {
         mobileOpen={mobileMenuOpen}
         onCloseMobile={() => setMobileMenuOpen(false)}
         onResetDemoData={handleResetDemoData}
+        adminEmail={adminEmail}
+        onOpenChangePassword={() => setPasswordModalOpen(true)}
+        onSignOut={handleSignOut}
       />
 
       <div className="flex-1 min-w-0 flex flex-col">
@@ -273,6 +309,18 @@ export default function App() {
           )}
         </main>
       </div>
+
+      {passwordModalOpen && (
+        <ChangePasswordModal
+          authToken={authToken}
+          adminEmail={adminEmail}
+          onClose={() => setPasswordModalOpen(false)}
+          onPasswordUpdated={(newToken) => {
+            setAuthToken(newToken);
+            setBannerMessage('Admin password updated successfully.');
+          }}
+        />
+      )}
     </div>
   );
 }
